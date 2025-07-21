@@ -31,9 +31,9 @@ public class StudentService {
         throw new StudentNotFoundException();
     }
     public void saveStudent(Student student) {
-
+        Student stored = findById(student.getId());
         if (student.getPassword() == null || student.getPassword().isEmpty()) {
-            student.setPassword(student.getPassword());
+            student.setPassword(stored.getPassword());
         } else {
             student.setPassword(encoder.encode(student.getPassword()));
         }
