@@ -39,7 +39,7 @@ public class TeacherService {
         teacher.addStudent(student);
         student.setTeacher(teacher);
         teacherRepository.save(teacher);
-        studentService.saveStudent(student);
+        studentService.updateStudent(student);
     }
     @Transactional
     public void removeStudent(long studentId, long teacherId) {
@@ -48,7 +48,7 @@ public class TeacherService {
         teacher.removeStudent(student);
         student.setTeacher(null);
         teacherRepository.save(teacher);
-        studentService.saveStudent(student);
+        studentService.updateStudent(student);
     }
     public Iterable<Teacher> findAll() {
         return teacherRepository.findAll();

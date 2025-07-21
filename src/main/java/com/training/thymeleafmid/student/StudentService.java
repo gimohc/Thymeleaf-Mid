@@ -38,7 +38,9 @@ public class StudentService {
             student.setPassword(encoder.encode(student.getPassword()));
         }
         studentRepository.save(student);
-
+    }
+    public void updateStudent(Student student) {
+        studentRepository.save(student);
     }
     public Teacher getTeacherByStudentId(long studentId) {
         return findById(studentId).getTeacher();
