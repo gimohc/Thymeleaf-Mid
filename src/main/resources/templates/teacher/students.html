@@ -7,14 +7,16 @@
 </head>
 <body>
     <table th:each="student : ${students}">
-        <tr th:object="student">
-            <td th:value="*{id}"></td>
-            <td th:value="*{name}"></td>
-            <td th:value="*{phoneNumber}"></td>
+        <tr th:object="${student}   ">
+            <td th:text="'ID: ' + *{id}"></td>
+            <td th:text="'Name: ' + *{name}"></td>
+            <td th:text="'Number' + *{phoneNumber}"></td>
             <td>
-                <button type="submit" th:formaction="@{teacher/unassign/*{id}}">
-                    Unassign
-                </button>
+                <form th:action="@{/teacher/unassign/{studentId}(studentId=*{id})}" method="post">
+                    <button type="submit">
+                        Unassign
+                    </button>
+                </form>
             </td>
         </tr>
     </table>
