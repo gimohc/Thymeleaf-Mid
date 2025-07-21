@@ -8,9 +8,9 @@
 <body>
     <table th:each="teacher : ${teachers}">
         <tr th:object="${teacher}">
-            <td th:text="*{id}"></td>
-            <td th:text="*{name}"></td>
-            <td th:text="*{phoneNumber}"></td>
+            <td th:text="'ID: ' + *{id}"></td>
+            <td th:text="'Name: ' + *{name}"></td>
+            <td th:text="'Number' + *{phoneNumber}"></td>
             <td>
                 <form th:action="@{/student/assign/{teacherId}(teacherId=*{id})}" method="post">
                     <button type="submit"> Assign </button>
