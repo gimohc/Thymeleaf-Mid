@@ -29,7 +29,7 @@ public class Teacher {
 
     @ToString.Exclude // Also exclude from toString
     @EqualsAndHashCode.Exclude // Exclude this field from equals and hashCode
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private Set<Student> students;
 
     public void addStudent(Student student){
