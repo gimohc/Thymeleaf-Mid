@@ -17,7 +17,7 @@ public class Student {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "teacher_id") // nullable= false)
     private Teacher teacher;
     private String phoneNumber;
     private double grade;
