@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset = "ISO-8859-1" />
+    <link href = "css/styles.css" rel = "stylesheet"/>
+    <title>Spring Boot Application</title>
+</head>
+<body>
+    <form th:action="@{save}" method="post" th:object="${student}">
+        <label> Name: <input type="text" th:field="*{name}"/> </label>
+        <label> Phone number: <input type="text" th:field="*{phoneNumber}"></label>
+        <label> Password: <input type="text" th:field="*{password}"></label>
+        <p> Teacher:
+            <label th:if="${student.teacher != null}" th:text="*{teacher.name}"></label>
+            <label th:if="${student.teacher == null}">Not assigned</label>
+            <button type="submit" formmethod="get" th:formaction="@{teachers}"> Assign </button>
+            <button type="submit" th:formaction="@{student/unassign/${student.id}}" th:formmethod="post">
+                Unassign current
+            </button>
+        </p>
+        <button type="submit"> Save </button>
+
+
+
+    </form>
+
+</body>

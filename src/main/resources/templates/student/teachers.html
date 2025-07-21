@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset = "ISO-8859-1" />
+    <link href = "css/styles.css" rel = "stylesheet"/>
+    <title>Spring Boot Application</title>
+</head>
+<body>
+    <table th:each="teacher : ${teachers}">
+        <tr th:object="${teacher}">
+            <td th:text="*{id}"></td>
+            <td th:text="*{name}"></td>
+            <td th:text="*{phoneNumber}"></td>
+            <td>
+                <form th:action="@{/student/assign/{teacherId}(teacherId=*{id})}" method="post">
+                    <button type="submit"> Assign </button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+</body>
