@@ -56,6 +56,7 @@ public class StudentController {
 
         return "student/view";
     }
+    //TODO FIX logging in not working after certain amount of times... login issue
     @PostMapping("register")
     public String saveNewStudent(@ModelAttribute Student student){
         studentService.saveNewStudent(student);
