@@ -13,14 +13,20 @@
         <label> Password:
             <input type="password" th:field="*{password}" value="" autocomplete="new-password" />
         </label>
-        <p> Teacher:
-            <label th:if="${student.teacher != null}" th:text="*{teacher.name}"></label>
-            <label th:if="${student.teacher == null}">Not assigned</label>
-            <button type="submit" formmethod="get" th:formaction="@{teachers}"> Assign </button>
-            <button type="submit" th:formaction="@{student/unassign/${student.id}}" th:formmethod="post">
-                Unassign current
+        <p th:if="${student.teacher != null}" > Teacher:
+            <label  th:text="*{teacher.name}"></label>
+            <button type="submit"
+                    th:if="${student.teacher != null}"
+                    th:formaction="@{/student/unassign/{teacherId}(teacherId=${student.teacher.id})}"
+                    th:formmethod="post"
+                    class="button-danger">
+                Unassign
             </button>
         </p>
+
+        <label th:if="*{teacher == null}">Not assigned</label>
+        <button type="submit" th:formmethod="get" th:formaction="@{teachers}"> Assign </button>
+
         <button type="submit"> Save </button>
 
 
