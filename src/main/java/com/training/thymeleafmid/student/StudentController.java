@@ -21,6 +21,8 @@ public class StudentController {
         this.studentService = studentService;
         this.teacherService = teacherService;
     }
+
+    // TODO save also makes password invalid
     @PostMapping("/save")
     public String saveStudent(@ModelAttribute Student student) {
         studentService.saveStudent(student);

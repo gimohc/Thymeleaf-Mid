@@ -65,7 +65,7 @@ public class TeacherController {
         return "teacher/register";
     }
     @PostMapping("register")
-    public String register(@ModelAttribute Teacher teacher){
+    public String register(@ModelAttribute Teacher teacher) {
         teacherService.saveNewTeacher(teacher);
         return "redirect:/teacher/login";
 
