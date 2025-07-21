@@ -4,6 +4,8 @@ package com.training.thymeleafmid.teacher;
 import com.training.thymeleafmid.student.Student;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.Set;
 
@@ -24,6 +26,9 @@ public class Teacher {
     //cascade means that if a teacher was deleted, then so will the students
     //orphanRemoval means that if a student was deleted, it will be removed from the teacher's set
     //lazy fetch means only retrieving the data when requested
+
+    @ToString.Exclude // Also exclude from toString
+    @EqualsAndHashCode.Exclude // Exclude this field from equals and hashCode
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Student> students;
 
