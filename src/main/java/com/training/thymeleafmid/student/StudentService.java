@@ -1,8 +1,9 @@
 package com.training.thymeleafmid.student;
 
 import com.training.thymeleafmid.Exceptions.StudentNotFoundException;
-import com.training.thymeleafmid.teacher.Teacher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +20,7 @@ public class StudentService implements UserDetailsService {
     private final PasswordEncoder encoder;
 
     @Autowired
-    public StudentService(StudentRepository studentRepository, PasswordEncoder passwordEncoder) {
+    public StudentService(StudentRepository studentRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.studentRepository = studentRepository;
         this.encoder = passwordEncoder;
     }
@@ -41,22 +42,16 @@ public class StudentService implements UserDetailsService {
     public void updateStudent(Student student) {
         studentRepository.save(student);
     }
-    public Teacher getTeacherByStudentId(long studentId) {
-        return findById(studentId).getTeacher();
-    }
-    public void deleteStudent(Student student){
-        studentRepository.delete(student);
-    }
     public void saveNewStudent(Student student){
         student.setPassword(encoder.encode(student.getPassword()));
         studentRepository.save(student);
     }
+    public Student authenticateStudent(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        long studentId = Long.parseLong(userDetails.getUsername());
+        return findById(studentId);
+    }
 
-//    public boolean validateLogin(LoginRequest request) {
-//        String password = studentRepository.findPasswordById(request.getId());
-//        return encoder.matches(request.getPassword(), password);
-//
-//    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Student student = studentRepository.findById(Long.valueOf(username))
