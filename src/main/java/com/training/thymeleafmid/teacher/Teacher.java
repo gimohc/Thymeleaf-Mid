@@ -1,12 +1,14 @@
 package com.training.thymeleafmid.teacher;
 
 
+import com.training.thymeleafmid.admin.Role;
 import com.training.thymeleafmid.student.Student;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -32,6 +34,16 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private Set<Student> students;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name="role", joinColumns = @JoinColumn (name= "teacher_id"), inverseJoinColumns = @JoinColumn (name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    private void addRole(Role role) {
+        roles.add(role);
+    }
+    private void removeRole(Role role) {
+        roles.remove(role);
+    }
     public void addStudent(Student student){
         students.add(student);
         student.setTeacher(this);
