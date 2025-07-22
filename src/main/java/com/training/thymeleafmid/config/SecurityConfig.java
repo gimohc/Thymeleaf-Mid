@@ -22,16 +22,6 @@ public class SecurityConfig {
     public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
         this.jwtRequestFilter = jwtRequestFilter;
     }
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        var user = User.withUsername("user")
-//                .password(passwordEncoder().encode("password"))
-//                .roles("USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
