@@ -47,6 +47,8 @@ public class StudentService implements UserDetailsService {
         studentRepository.save(student);
     }
     public Student authenticateStudent(Authentication authentication) {
+        if(authentication == null) return null;
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         long studentId = Long.parseLong(userDetails.getUsername());
         return findById(studentId);
