@@ -33,5 +33,13 @@ public class Role {
         }
     }
 
+    public void addTeacher(Teacher teacher) {
+        teachers.add(teacher);
+        teacher.addRole(this);
+    }
+    public void removeTeacher(Teacher teacher) {
+        teachers.remove(teacher);
+    }
+
 
 }
