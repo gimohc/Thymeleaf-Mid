@@ -78,6 +78,8 @@
 
 <form th:action="@{/student/login}" method="post" th:object="${details}">
     <h2>Student Login</h2>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div>
         <label for="id">ID:</label>
         <input id="id" type="text" th:field="*{id}" />
