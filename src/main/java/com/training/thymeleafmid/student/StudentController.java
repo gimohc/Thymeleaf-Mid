@@ -1,47 +1,29 @@
 package com.training.thymeleafmid.student;
 
 import com.training.thymeleafmid.LoginRequest;
-import com.training.thymeleafmid.config.JwtUtil;
+import com.training.thymeleafmid.config.AuthService;
 import com.training.thymeleafmid.teacher.TeacherService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/student")
 public class StudentController {
     private final StudentService studentService;
     private final TeacherService teacherService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
+
 
     @Autowired
-    public StudentController(StudentService studentService, TeacherService teacherService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public StudentController(AuthService authService, StudentService studentService, TeacherService teacherService) {
         this.studentService = studentService;
+        this.authService = authService;
         this.teacherService = teacherService;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
-
-    private Authentication saveCookie(HttpServletResponse response, LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getId(), request.getPassword())
-        );
-        String jwt = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
-        Cookie cookie = new Cookie("token", jwt);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60);
-        response.addCookie(cookie);
-
-        return authentication;
     }
 
     @PostMapping("/save")
@@ -58,12 +40,17 @@ public class StudentController {
     @PostMapping("/login")
     public String processLogin(
             @ModelAttribute LoginRequest loginRequest // Use @ModelAttribute to get the form data
-            , HttpServletResponse response){
-
-        if(saveCookie(response, loginRequest).isAuthenticated())
+            , HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ){
+        try {
+            authService.authenticateAndSetCookie(response, loginRequest, true);
+            // type: true -> student, false -> teacher
             return "redirect:/student/view";
-
-        return "redirect:/student/login?error=true";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Invalid credentials. Please try again.");
+            return "redirect:/student/login?error=true";
+        }
     }
     @GetMapping("/view")
     public String view(Model model, Authentication authentication) {
@@ -78,10 +65,26 @@ public class StudentController {
 
         return "student/view";
     }
-    @PostMapping("register")
-    public String saveNewStudent(@ModelAttribute Student student, HttpServletResponse response){
-        studentService.saveNewStudent(student);
-        saveCookie(response, new LoginRequest(student.getId(), student.getPassword()));
+    @PostMapping("/register")
+    public String saveNewStudent(
+            @ModelAttribute Student student,
+            HttpServletResponse response,
+            RedirectAttributes redirectAttributes
+    ){
+        LoginRequest request = new LoginRequest(-1, student.getPassword());
+        Student newStudent = studentService.saveNewStudent(student);
+        request.setId(newStudent.getId());
+        try {
+            authService.authenticateAndSetCookie(
+                    response, request, true
+            ); // initialized student id and the raw password
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    "Unable to automatically log in, please log in manually."
+            );
+            return "redirect:/student/login";
+        }
         return "redirect:/student/view";
     }
     @GetMapping("register")
@@ -101,13 +104,7 @@ public class StudentController {
 
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
-
-        Cookie cookie = new Cookie("token", null); // Erase the value
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Tell the browser to delete it immediately
-        response.addCookie(cookie);
-
+        authService.deleteCookie(response);
         return "redirect:/student/login";
     }
 
