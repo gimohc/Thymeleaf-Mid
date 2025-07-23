@@ -1,5 +1,8 @@
 package com.training.thymeleafmid.teacher;
 
+import com.training.thymeleafmid.Exceptions.RoleNotFoundException;
+import com.training.thymeleafmid.admin.Role;
+import com.training.thymeleafmid.admin.RoleRepository;
 import com.training.thymeleafmid.student.Student;
 import com.training.thymeleafmid.student.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +19,15 @@ public class TeacherService {
     private final TeacherRepository teacherRepository;
     private final PasswordEncoder encoder;
     private final StudentService studentService;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public TeacherService(TeacherRepository teacherRepository, StudentService studentService
-                          , PasswordEncoder passwordEncoder) {
+                          , PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.teacherRepository = teacherRepository;
         this.encoder = passwordEncoder;
         this.studentService = studentService;
+        this.roleRepository = roleRepository;
     }
     public Teacher findById(long id){
         Optional<Teacher> teacherOpt = teacherRepository.findById(id);
@@ -49,9 +54,10 @@ public class TeacherService {
     public Iterable<Teacher> findAll() {
         return teacherRepository.findAll();
     }
-
     public Teacher saveNewTeacher(Teacher teacher) {
         teacher.setPassword(encoder.encode(teacher.getPassword()));
+        Role role = roleRepository.findByName("ROLE_TEACHER").orElseThrow(RoleNotFoundException::new);
+        teacher.addRole(role);
         teacherRepository.save(teacher);
         return teacher;
     }
@@ -65,9 +71,6 @@ public class TeacherService {
         }
         teacherRepository.save(teacher);
     }
-    public Iterable<Student> getStudents(long teacherId){
-        return findById(teacherId).getStudents();
-    }
     public Teacher authenticate(Authentication authentication) {
         if(authentication == null) return null;
         UserDetails details = (UserDetails) authentication.getPrincipal();
@@ -75,11 +78,3 @@ public class TeacherService {
         return findById(teacherId);
     }
 }
-
-/*
-   public boolean validateLogin(LoginRequest request) {
-        String password = teacherRepository.findPasswordById(request.getId());
-        return encoder.matches(request.getPassword(), password);
-    }
-
- */
