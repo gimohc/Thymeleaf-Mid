@@ -26,10 +26,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login", "/authenticate", "/css/**").permitAll() // Public endpoints
-//                        .anyRequest().authenticated() // All other requests need authentication
-//                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/teacher/**").hasRole("ROLE_TEACHER")
+                        .requestMatchers("/student/**").hasRole("ROLE_STUDENT")
+                        .requestMatchers("**/login", "**/register").permitAll()
+                        .anyRequest().authenticated() // All other requests need authentication
+                )
                 // Tell Spring Security not to manage sessions, as we use JWTs
                 .sessionManagement( session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // Define a logout handler
