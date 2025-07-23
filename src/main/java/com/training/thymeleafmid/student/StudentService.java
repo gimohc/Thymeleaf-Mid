@@ -1,21 +1,15 @@
 package com.training.thymeleafmid.student;
 
-import com.training.thymeleafmid.Exceptions.StudentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
-public class StudentService implements UserDetailsService {
+public class StudentService {
     private final StudentRepository studentRepository;
     private final PasswordEncoder encoder;
 
@@ -26,9 +20,7 @@ public class StudentService implements UserDetailsService {
     }
     public Student findById(long id){
         Optional<Student> studentOpt = studentRepository.findById(id);
-        if(studentOpt.isPresent())
-            return studentOpt.get();
-        throw new StudentNotFoundException();
+        return studentOpt.orElse(null);
     }
     public void saveStudent(Student student) {
         Student stored = findById(student.getId());
@@ -42,27 +34,17 @@ public class StudentService implements UserDetailsService {
     public void updateStudent(Student student) {
         studentRepository.save(student);
     }
-    public void saveNewStudent(Student student){
+    public Student saveNewStudent(Student student){
         student.setPassword(encoder.encode(student.getPassword()));
         studentRepository.save(student);
+        return student;
     }
     public Student authenticateStudent(Authentication authentication) {
         if(authentication == null) return null;
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        long studentId = Long.parseLong(userDetails.getUsername());
+        long studentId = Long.parseLong(userDetails.getUsername().split(":")[1]);
         return findById(studentId);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Student student = studentRepository.findById(Long.valueOf(username))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + username));
-
-        return new User(
-                String.valueOf(student.getId()),
-                student.getPassword(),
-                new ArrayList<>() // For this basic setup, we provide an empty list of roles (authorities).
-        );
-    }
 }

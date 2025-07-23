@@ -1,10 +1,10 @@
 package com.training.thymeleafmid.teacher;
 
-import com.training.thymeleafmid.Exceptions.TeacherNotFoundException;
-import com.training.thymeleafmid.LoginRequest;
 import com.training.thymeleafmid.student.Student;
 import com.training.thymeleafmid.student.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,18 +19,14 @@ public class TeacherService {
 
     @Autowired
     public TeacherService(TeacherRepository teacherRepository, StudentService studentService
-                          //, StudentRepository studentRepository
                           , PasswordEncoder passwordEncoder) {
         this.teacherRepository = teacherRepository;
         this.encoder = passwordEncoder;
-        //this.studentRepository = studentRepository;
         this.studentService = studentService;
     }
     public Teacher findById(long id){
         Optional<Teacher> teacherOpt = teacherRepository.findById(id);
-        if(teacherOpt.isPresent())
-            return teacherOpt.get();
-        throw new TeacherNotFoundException();
+        return teacherOpt.orElse(null);
     }
     @Transactional
     public void addStudent(long studentId, long teacherId) {
@@ -53,13 +49,11 @@ public class TeacherService {
     public Iterable<Teacher> findAll() {
         return teacherRepository.findAll();
     }
-    public boolean validateLogin(LoginRequest request) {
-        String password = teacherRepository.findPasswordById(request.getId());
-        return encoder.matches(request.getPassword(), password);
-    }
-    public void saveNewTeacher(Teacher teacher) {
+
+    public Teacher saveNewTeacher(Teacher teacher) {
         teacher.setPassword(encoder.encode(teacher.getPassword()));
         teacherRepository.save(teacher);
+        return teacher;
     }
     public void saveTeacher(Teacher teacher) {
         Teacher storedTeacher = findById(teacher.getId());
@@ -74,4 +68,18 @@ public class TeacherService {
     public Iterable<Student> getStudents(long teacherId){
         return findById(teacherId).getStudents();
     }
+    public Teacher authenticate(Authentication authentication) {
+        if(authentication == null) return null;
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        long teacherId = Long.parseLong(details.getUsername().split(":")[1]);
+        return findById(teacherId);
+    }
 }
+
+/*
+   public boolean validateLogin(LoginRequest request) {
+        String password = teacherRepository.findPasswordById(request.getId());
+        return encoder.matches(request.getPassword(), password);
+    }
+
+ */
