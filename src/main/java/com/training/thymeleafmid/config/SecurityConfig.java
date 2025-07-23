@@ -27,10 +27,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ROLE_ADMIN")
-                        .requestMatchers("/teacher/**").hasRole("ROLE_TEACHER")
-                        .requestMatchers("/student/**").hasRole("ROLE_STUDENT")
-                        .requestMatchers("**/login", "**/register").permitAll()
+                        .requestMatchers("/*/login", "/*/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+                        .requestMatchers("/student/**").hasRole("STUDENT")
                         .anyRequest().authenticated() // All other requests need authentication
                 )
                 // Tell Spring Security not to manage sessions, as we use JWTs
