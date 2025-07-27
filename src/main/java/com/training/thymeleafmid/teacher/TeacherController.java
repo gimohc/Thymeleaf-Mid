@@ -16,19 +16,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TeacherController {
     private final TeacherService teacherService;
     private final AuthService authService;
-    private final TeacherRepository teacherRepository;
 
     @Autowired
-    public TeacherController(AuthService authService, TeacherService teacherService, TeacherRepository teacherRepository) {
+    public TeacherController(AuthService authService, TeacherService teacherService) {
         this.teacherService = teacherService;
         this.authService = authService;
-        this.teacherRepository = teacherRepository;
     }
 
     @GetMapping("/view")
     public String view(Model model, Authentication authentication) {
-        // Get the student's ID from the session.
-        //Long teacherId = (Long) session.getAttribute("loggedInTeacherId");
         Teacher teacher = teacherService.authenticate(authentication);
         if (teacher == null) {
             return "redirect:/teacher/login"; // Kick them back to the login page.
@@ -57,10 +53,10 @@ public class TeacherController {
         try {
             authService.authenticateAndSetCookie(response, loginRequest, false);
             // type: true -> student, false -> teacher
-            return "redirect:/student/view";
+            return "redirect:/teacher/view";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Invalid credentials. Please try again.");
-            return "redirect:/student/login?error=true";
+            return "redirect:/teacher/login?error=true";
         }
     }
 
