@@ -27,7 +27,7 @@ public class Role {
     private Set<Teacher> teachers = new HashSet<>();
 
     @PreRemove
-    private void remoteTeachersFromRole() {
+    private void removeTeachersFromRole() {
         for (Teacher teacher : teachers) {
             teacher.removeRole(this);
         }
