@@ -35,7 +35,7 @@ public class Teacher {
     private Set<Student> students;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name="role", joinColumns = @JoinColumn (name= "teacher_id"), inverseJoinColumns = @JoinColumn (name = "role_id"))
+    @JoinTable(name="teacher_roles", joinColumns = @JoinColumn (name= "teacher_id"), inverseJoinColumns = @JoinColumn (name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     public void addRole(Role role) {
