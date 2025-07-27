@@ -2,6 +2,7 @@ package com.training.thymeleafmid.teacher;
 
 
 import com.training.thymeleafmid.admin.Role;
+import com.training.thymeleafmid.entities.User;
 import com.training.thymeleafmid.student.Student;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,12 +15,8 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name="teachers")
-public class Teacher {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String name;
-    private String password;
+public class Teacher extends User {
+
     private String phoneNumber;
     private int workTime;
     private double hourlyPay;

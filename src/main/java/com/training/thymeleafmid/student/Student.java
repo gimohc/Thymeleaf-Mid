@@ -1,6 +1,7 @@
 package com.training.thymeleafmid.student;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.training.thymeleafmid.entities.User;
 import com.training.thymeleafmid.teacher.Teacher;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,12 +9,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name="students")
-public class Student {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String name;
+public class Student extends User {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
@@ -21,6 +17,5 @@ public class Student {
     private Teacher teacher;
     private String phoneNumber;
     private double grade;
-    private String password;
 
 }
