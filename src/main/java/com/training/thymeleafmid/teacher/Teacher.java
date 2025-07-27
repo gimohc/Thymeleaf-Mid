@@ -44,6 +44,9 @@ public class Teacher {
     public void removeRole(Role role) {
         roles.remove(role);
     }
+    public void clearRoles() {
+        roles.clear();
+    }
     public void addStudent(Student student){
         students.add(student);
         student.setTeacher(this);
