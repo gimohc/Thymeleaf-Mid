@@ -28,18 +28,8 @@ public class Role {
 
     @PreRemove
     private void remoteTeachersFromRole() {
-        for(Teacher teacher: teachers) {
+        for (Teacher teacher : teachers) {
             teacher.removeRole(this);
         }
     }
-
-    public void addTeacher(Teacher teacher) {
-        teachers.add(teacher);
-        teacher.addRole(this);
-    }
-    public void removeTeacher(Teacher teacher) {
-        teachers.remove(teacher);
-    }
-
-
 }
