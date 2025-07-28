@@ -115,26 +115,26 @@
     <table>
         <thead>
         <tr>
-            <th>Teacher ID</th>
-            <th>Teacher Name</th>
+            <th>User ID</th>
+            <th>User Name</th>
             <th>Roles</th>
             <th>Action</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="teacher : ${teachers}" th:object="${teacher}">
+        <tr th:each="user : ${users}" th:object="${user}">
             <td th:text="*{id}"></td>
             <td th:text="*{name}"></td>
             <td>
-                <div th:if="${!teacher.roles.isEmpty()}">
+                <div th:if="${!user.roles.isEmpty()}">
                     <div th:each="role : *{roles}" th:text="${role.name}"></div>
                 </div>
-                <span th:if="${teacher.roles.isEmpty()}">None</span>
+                <span th:if="${user.roles.isEmpty()}">None</span>
             </td>
             <td>
                 <form method="post" th:action="@{/admin/give}">
-                    <input type="hidden" name="teacherId" th:value="${teacher.id}">
-                    <button th:formaction="@{/admin/removeRoles/{teacherId}(teacherId=*{id})}"  type="submit">Clear</button>
+                    <input type="hidden" name="userId" th:value="${user.id}">
+                    <button th:formaction="@{/admin/removeRoles/{userId}(userId=*{id})}"  type="submit">Clear</button>
                     <select name="roleId"> name="roleId">
                         <option value="">-- Select an option --</option>
                         <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}"></option>
