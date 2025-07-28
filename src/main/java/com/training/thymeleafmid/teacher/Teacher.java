@@ -1,22 +1,27 @@
 package com.training.thymeleafmid.teacher;
 
-
-import com.training.thymeleafmid.admin.Role;
-import com.training.thymeleafmid.entities.User;
+import com.training.thymeleafmid.user.User;
 import com.training.thymeleafmid.student.Student;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
 @Table(name="teachers")
-public class Teacher extends User {
+@NoArgsConstructor
+public class Teacher {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
     private String phoneNumber;
     private int workTime;
     private double hourlyPay;
@@ -31,19 +36,7 @@ public class Teacher extends User {
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private Set<Student> students;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name="teacher_roles", joinColumns = @JoinColumn (name= "teacher_id"), inverseJoinColumns = @JoinColumn (name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
 
-    public void addRole(Role role) {
-        roles.add(role);
-    }
-    public void removeRole(Role role) {
-        roles.remove(role);
-    }
-    public void clearRoles() {
-        roles.clear();
-    }
     public void addStudent(Student student){
         students.add(student);
         student.setTeacher(this);
