@@ -27,37 +27,17 @@ public class StudentController {
     }
 
     @PostMapping("/save")
-    public String saveStudent(@ModelAttribute Student student) {
-        studentService.saveStudent(student);
+    public String saveStudent(@ModelAttribute StudentDTO request, Authentication authentication) {
+        Student student = studentService.authenticateStudent(authentication);
+        studentService.saveStudent(student.getId(), request);
         return "redirect:/student/view";
-    }
-
-    @GetMapping("/login")
-    public String login(Model model){
-        model.addAttribute("details", new LoginRequest());
-        return "student/login";
-    }
-    @PostMapping("/login")
-    public String processLogin(
-            @ModelAttribute LoginRequest loginRequest // Use @ModelAttribute to get the form data
-            , HttpServletResponse response,
-            RedirectAttributes redirectAttributes
-    ){
-        try {
-            authService.authenticateAndSetCookie(response, loginRequest, true);
-            // type: true -> student, false -> teacher
-            return "redirect:/student/view";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Invalid credentials. Please try again.");
-            return "redirect:/student/login?error=true";
-        }
     }
     @GetMapping("/view")
     public String view(Model model, Authentication authentication) {
 
         Student student = studentService.authenticateStudent(authentication);
         if (student == null) {
-            return "redirect:/student/login"; // Kick them back to the login page.
+            return "redirect:/login"; // Kick them back to the login page.
         }
 
         // Fetch the student's full details using the ID from the session.
@@ -67,7 +47,7 @@ public class StudentController {
     }
     @PostMapping("/register")
     public String saveNewStudent(
-            @ModelAttribute Student student,
+            @ModelAttribute StudentDTO student,
             HttpServletResponse response,
             RedirectAttributes redirectAttributes
     ){
@@ -75,28 +55,27 @@ public class StudentController {
         Student newStudent = studentService.saveNewStudent(student);
         request.setId(newStudent.getId());
         try {
-            authService.authenticateAndSetCookie(
-                    response, request, true
-            ); // initialized student id and the raw password
+            authService.authenticateAndSetCookie(response, request);
+            // initialized student id and the raw password
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "Unable to automatically log in, please log in manually."
             );
-            return "redirect:/student/login";
+            return "redirect:/login";
         }
         return "redirect:/student/view";
     }
     @GetMapping("register")
     public String register(Model model){
-        model.addAttribute("student", new Student());
+        model.addAttribute("student", new StudentDTO());
         return "student/register";
     }
     @GetMapping("/teachers")
     public String teachers(Model model, Authentication authentication) {
         Student student = studentService.authenticateStudent(authentication);
         if (student == null)
-            return "redirect:/student/login"; // Kick them back to the login page.
+            return "redirect:/login"; // Kick them back to the login page.
 
         model.addAttribute("teachers", teacherService.findAll());
         return "student/teachers";
@@ -105,20 +84,20 @@ public class StudentController {
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
         authService.deleteCookie(response);
-        return "redirect:/student/login";
+        return "redirect:/login";
     }
 
     @PostMapping("/unassign/{teacherId}")
     public String unassign(@PathVariable("teacherId") long teacherId, Authentication authentication){
         Student student = studentService.authenticateStudent(authentication);
-        if(student == null) return "redirect:/student/login";
+        if(student == null) return "redirect:/login";
         teacherService.removeStudent(student.getId(), teacherId);
         return "redirect:/student/view";
     }
     @PostMapping("/assign/{teacherId}")
     public String assign(@PathVariable("teacherId") long teacherId, Authentication authentication){
         Student student = studentService.authenticateStudent(authentication);
-        if(student == null) return "redirect:/student/login";
+        if(student == null) return "redirect:/login";
         teacherService.addStudent(student.getId(), teacherId);
         return "redirect:/student/view";
     }
