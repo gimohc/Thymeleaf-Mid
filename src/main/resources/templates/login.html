@@ -76,8 +76,8 @@
 </head>
 <body>
 
-<form th:action="@{/teacher/login}" method="post" th:object="${details}">
-    <h2>Teacher Login</h2>
+<form th:action="@{/login}" method="post" th:object="${details}">
+    <h2>Login</h2>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div>
