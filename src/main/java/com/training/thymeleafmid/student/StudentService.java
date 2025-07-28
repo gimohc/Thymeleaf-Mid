@@ -1,5 +1,12 @@
 package com.training.thymeleafmid.student;
 
+import com.training.thymeleafmid.Exceptions.RoleNotFoundException;
+import com.training.thymeleafmid.Exceptions.UserNotFoundException;
+import com.training.thymeleafmid.admin.Role;
+import com.training.thymeleafmid.admin.RoleRepository;
+import com.training.thymeleafmid.user.User;
+import com.training.thymeleafmid.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -12,38 +19,59 @@ import java.util.Optional;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final PasswordEncoder encoder;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public StudentService(StudentRepository studentRepository, @Lazy PasswordEncoder passwordEncoder) {
+    public StudentService(UserRepository userRepository, RoleRepository roleRepository, StudentRepository studentRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.studentRepository = studentRepository;
         this.encoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
     public Student findById(long id){
         Optional<Student> studentOpt = studentRepository.findById(id);
         return studentOpt.orElse(null);
     }
-    public void saveStudent(Student student) {
-        Student stored = findById(student.getId());
-        if (student.getPassword() == null || student.getPassword().isEmpty()) {
-            student.setPassword(stored.getPassword());
-        } else {
-            student.setPassword(encoder.encode(student.getPassword()));
+    public void saveStudent(long userId, StudentDTO request) {
+        User userToUpdate = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        userToUpdate.setName(request.getName());
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            userToUpdate.setPassword(encoder.encode(request.getPassword()));
         }
-        studentRepository.save(student);
+        Student profile = userToUpdate.getStudentProfile();
+        profile.setPhoneNumber(request.getPhoneNumber());
     }
     public void updateStudent(Student student) {
         studentRepository.save(student);
     }
-    public Student saveNewStudent(Student student){
-        student.setPassword(encoder.encode(student.getPassword()));
-        studentRepository.save(student);
-        return student;
+    @Transactional
+    public Student saveNewStudent(StudentDTO request){
+        User user = new User();
+        Student newStudent = new Student();
+
+        Role role = roleRepository.findByName("ROLE_STUDENT")
+                .orElseThrow(() -> new RoleNotFoundException("Role not found"));
+
+        user.addRole(role);
+        user.setPassword(encoder.encode(request.getPassword()));
+        user.setName(request.getName());
+
+        newStudent.setPhoneNumber(request.getPhoneNumber());
+
+        newStudent.setUser(user);
+        user.setStudentProfile(newStudent);
+
+        return studentRepository.save(newStudent);
     }
     public Student authenticateStudent(Authentication authentication) {
         if(authentication == null) return null;
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        long studentId = Long.parseLong(userDetails.getUsername().split(":")[1]);
+        long studentId = Long.parseLong(userDetails.getUsername());
         return findById(studentId);
     }
 
