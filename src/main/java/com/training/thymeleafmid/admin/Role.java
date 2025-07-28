@@ -1,6 +1,6 @@
 package com.training.thymeleafmid.admin;
 
-import com.training.thymeleafmid.teacher.Teacher;
+import com.training.thymeleafmid.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,12 +24,12 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<Teacher> teachers = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 
     @PreRemove
-    private void removeTeachersFromRole() {
-        for (Teacher teacher : teachers) {
-            teacher.removeRole(this);
+    private void removeUsersFromRole() {
+        for (User user : users) {
+            user.removeRole(this);
         }
     }
 }
