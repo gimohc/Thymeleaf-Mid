@@ -1,7 +1,13 @@
 package com.training.thymeleafmid.admin;
 
+import com.training.thymeleafmid.Exceptions.RoleNotFoundException;
+import com.training.thymeleafmid.Exceptions.UserNotFoundException;
+import com.training.thymeleafmid.student.Student;
+import com.training.thymeleafmid.student.StudentService;
 import com.training.thymeleafmid.teacher.Teacher;
 import com.training.thymeleafmid.teacher.TeacherService;
+import com.training.thymeleafmid.user.User;
+import com.training.thymeleafmid.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,12 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
-    private final TeacherService teacherService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public RoleService(RoleRepository roleRepository, TeacherService teacherService) {
+    public RoleService(RoleRepository roleRepository, UserRepository userRepository) {
         this.roleRepository = roleRepository;
-        this.teacherService = teacherService;
+        this.userRepository = userRepository;
     }
 
     public void addRole(Role role) {
@@ -30,20 +36,30 @@ public class RoleService {
     public Role findById(long id) {
         return roleRepository.findById(id).orElse(null);
     }
-    public void removeRolesFromTeacher(long teacherId) {
-        Teacher teacher = teacherService.findById(teacherId);
-        if(teacher != null) {
-            teacher.clearRoles();
-            teacherService.saveTeacher(teacher);
-        }
+
+    public void removeRolesFromUser(long teacherId) {
+        User user = userRepository.findById(teacherId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.clearRoles();
+        userRepository.save(user);
     }
+
     @Transactional
-    public void giveRole(long roleId, long teacherId) {
-        Teacher teacher = teacherService.findById(teacherId);
+    public void giveRole(long roleId, long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Role role = findById(roleId);
-        if(teacher != null && role != null && !teacher.getRoles().contains(role)) {
-            teacher.addRole(role);
-            teacherService.saveTeacher(teacher);
+        if(role == null) throw new RoleNotFoundException("Role not found");
+        if(!user.getRoles().contains(role)) {
+            user.addRole(role);
+            if(role.getName().equals("ROLE_STUDENT") && user.getStudentProfile() == null) {
+                Student student = new Student();
+                user.setStudentProfile(student);
+                student.setUser(user);
+            } else if(role.getName().equals("ROLE_TEACHER") && user.getTeacherProfile() == null) {
+                Teacher teacher = new Teacher();
+                teacher.setUser(user);
+                user.setTeacherProfile(teacher);
+            }
+
         }
     }
 }
