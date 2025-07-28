@@ -1,6 +1,6 @@
 package com.training.thymeleafmid.admin;
 
-import com.training.thymeleafmid.teacher.TeacherService;
+import com.training.thymeleafmid.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final RoleService roleService;
-    private final TeacherService teacherService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AdminController(RoleService roleService, TeacherService teacherService) {
-        this.teacherService = teacherService;
+    public AdminController(RoleService roleService, UserRepository userRepository) {
+        this.userRepository = userRepository;
         this.roleService = roleService;
     }
     @GetMapping("/index")
     public String index(Model model) {
         model.addAttribute("role", new Role());
         model.addAttribute("roles", roleService.findAll());
-        model.addAttribute("teachers", teacherService.findAll());
+        model.addAttribute("users", userRepository.findAll());
         return "admin/index";
     }
     @PostMapping("/createRole")
@@ -35,15 +35,14 @@ public class AdminController {
         roleService.removeRole(roleId);
         return "redirect:/admin/index";
     }
-    // not done
     @PostMapping("/give")
-    public String give(@RequestParam("roleId") long roleId, @RequestParam("teacherId") long teacherId) {
-        roleService.giveRole(roleId, teacherId);
+    public String give(@RequestParam("roleId") long roleId, @RequestParam("userId") long userId) {
+        roleService.giveRole(roleId, userId);
         return "redirect:/admin/index";
     }
-    @PostMapping("removeRoles/{teacherId}")
-    public String remove(@PathVariable long teacherId) {
-        roleService.removeRolesFromTeacher(teacherId);
+    @PostMapping("removeRoles/{userId}")
+    public String remove(@PathVariable long userId) {
+        roleService.removeRolesFromUser(userId);
         return "redirect:/admin/index";
     }
 
