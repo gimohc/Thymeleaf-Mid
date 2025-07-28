@@ -83,8 +83,6 @@
 <form th:action="@{/teacher/save}" method="post" th:object="${teacher}">
     <h2>Teacher Details</h2>
 
-    <input type="hidden" th:field="*{id}" />
-
     <div class="form-group">
         <label for="name">Name:</label>
         <input id="name" type="text" th:field="*{name}"/>
@@ -97,7 +95,14 @@
         <label for="password">New Password:</label>
         <input id="password" type="password" th:field="*{password}" value="" autocomplete="new-password" />
     </div>
-
+    <div class="form-group">
+        <label for="workingHours">Working Hours:</label>
+        <input id="workingHours" type="text" th:field="*{workTime}"/>
+    </div>
+    <div class="form-group">
+        <label for="hourlyPay">Working Hours:</label>
+        <input id="hourlyPay" type="text" th:field="*{hourlyPay}"/>
+    </div>
     <div class="form-group">
         <label>Students:</label>
         <a th:href="@{/teacher/students}" class="button">View Assigned Students</a>
