@@ -34,9 +34,6 @@ public class StudentController {
     @GetMapping("/view") // view editable personal details
     public String view(Model model, Authentication authentication) {
         Student student = studentService.authenticateStudent(authentication);
-        if (student == null) {
-            return "redirect:/login"; // Kick them back to the login page.
-        }
         StudentDTO dto = new StudentDTO(student);
         model.addAttribute("student", dto); // Add the logged-in student's data to the model.
 
@@ -53,8 +50,8 @@ public class StudentController {
         Student newStudent = studentService.saveNewStudent(student);
         request.setId(newStudent.getId());
 
-        authService.authenticateAndSetCookie(response, request);
         // initialized student id and the raw password
+        authService.authenticateAndSetCookie(response, request);
 
         return "redirect:/student/view";
     }
@@ -65,10 +62,7 @@ public class StudentController {
     }
     @GetMapping("/teachers")
     public String teachers(Model model, Authentication authentication) {
-        Student student = studentService.authenticateStudent(authentication);
-        if (student == null)
-            return "redirect:/login"; // Kick them back to the login page.
-
+        studentService.authenticateStudent(authentication);
         model.addAttribute("teachers", teacherService.findAll());
         return "student/teachers";
     }
@@ -82,14 +76,12 @@ public class StudentController {
     @PostMapping("/unassign/{teacherId}")
     public String unassign(@PathVariable("teacherId") long teacherId, Authentication authentication){
         Student student = studentService.authenticateStudent(authentication);
-        if(student == null) return "redirect:/login";
         teacherService.removeStudent(student.getId(), teacherId);
         return "redirect:/student/view";
     }
     @PostMapping("/assign/{teacherId}")
     public String assign(@PathVariable("teacherId") long teacherId, Authentication authentication){
         Student student = studentService.authenticateStudent(authentication);
-        if(student == null) return "redirect:/login";
         teacherService.addStudent(student.getId(), teacherId);
         return "redirect:/student/view";
     }
