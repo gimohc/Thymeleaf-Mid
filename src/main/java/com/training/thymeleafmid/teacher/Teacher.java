@@ -36,6 +36,14 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private Set<Student> students;
 
+    public Teacher(TeacherDTO dto) {
+        this.user.setName(dto.getName());
+        this.user.setPassword(dto.getPassword());
+        this.user.setTeacherProfile(this);
+        this.phoneNumber = dto.getPhoneNumber();
+        this.workTime = dto.getWorkTime();
+        this.hourlyPay = dto.getHourlyPay();
+    }
 
     public void addStudent(Student student){
         students.add(student);
