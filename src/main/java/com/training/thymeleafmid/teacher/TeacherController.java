@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/teacher")
@@ -25,9 +24,6 @@ public class TeacherController {
     @GetMapping("/view")
     public String view(Model model, Authentication authentication) {
         Teacher teacher = teacherService.authenticate(authentication);
-        if (teacher == null) {
-            return "redirect:/login"; // Kick them back to the login page.
-        }
         TeacherDTO dto = new TeacherDTO(teacher);
         model.addAttribute("teacher", dto); // Add the logged-in student's data to the model.
 
@@ -42,7 +38,6 @@ public class TeacherController {
     @GetMapping("/students")
     public String students(Model model, Authentication authentication) {
         Teacher teacher = teacherService.authenticate(authentication);
-        if(teacher == null) return "redirect:/login";
         model.addAttribute("students", teacher.getStudents());
         return "teacher/students";
     }
@@ -54,23 +49,13 @@ public class TeacherController {
     @PostMapping("/register")
     public String register(
             @ModelAttribute TeacherDTO teacher,
-           HttpServletResponse response,
-           RedirectAttributes redirectAttributes
+           HttpServletResponse response
     ) {
         LoginRequest request = new LoginRequest(-1, teacher.getPassword());
         Teacher newTeacher = teacherService.saveNewTeacher(teacher);
         request.setId(newTeacher.getId());
-        try {
-            authService.authenticateAndSetCookie(
-                    response, request
-            );
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "Unable to automatically log in, please log in manually."
-            );
-            return "redirect:/login";
-        }
+
+        authService.authenticateAndSetCookie(response, request);
         return "redirect:/teacher/view";
 
     }
@@ -78,7 +63,6 @@ public class TeacherController {
     public String unassign(@PathVariable("studentId") long studentId,
                            Authentication authentication){
         Teacher teacher = teacherService.authenticate(authentication);
-        if(teacher == null) return "redirect:/login";
         teacherService.removeStudent(studentId, teacher.getId());
         return "redirect:/teacher/view";
     }
@@ -86,7 +70,6 @@ public class TeacherController {
     public String assign(@PathVariable("studentId") long studentId,
                          Authentication authentication){
         Teacher teacher = teacherService.authenticate(authentication);
-        if(teacher == null) return "redirect:/login";
         teacherService.addStudent(studentId, teacher.getId());
         return "redirect:/teacher/view";
     }
