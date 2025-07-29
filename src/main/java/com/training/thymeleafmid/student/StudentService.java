@@ -1,6 +1,7 @@
 package com.training.thymeleafmid.student;
 
 import com.training.thymeleafmid.Exceptions.RoleNotFoundException;
+import com.training.thymeleafmid.Exceptions.StudentNotFoundException;
 import com.training.thymeleafmid.Exceptions.UserNotFoundException;
 import com.training.thymeleafmid.admin.Role;
 import com.training.thymeleafmid.admin.RoleRepository;
@@ -29,9 +30,11 @@ public class StudentService {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
     }
-    public Student findById(long id){
+    public Student findById(long id) throws StudentNotFoundException {
         Optional<Student> studentOpt = studentRepository.findById(id);
-        return studentOpt.orElse(null);
+        return studentOpt.orElseThrow(
+                () -> new StudentNotFoundException("Student not found")
+        );
     }
     @Transactional
     public void saveStudent(long userId, StudentDTO request) {
@@ -68,9 +71,8 @@ public class StudentService {
 
         return studentRepository.save(newStudent);
     }
-    public Student authenticateStudent(Authentication authentication) {
-        if(authentication == null) return null;
-
+    public Student authenticateStudent(Authentication authentication) throws StudentNotFoundException {
+        if(authentication == null) throw new StudentNotFoundException("Student not found");
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         long studentId = Long.parseLong(userDetails.getUsername());
         return findById(studentId);
