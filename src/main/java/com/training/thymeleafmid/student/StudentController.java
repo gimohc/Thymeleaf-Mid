@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/student")
@@ -26,22 +25,19 @@ public class StudentController {
         this.teacherService = teacherService;
     }
 
-    @PostMapping("/save")
+    @PostMapping("/save") // update student
     public String saveStudent(@ModelAttribute StudentDTO request, Authentication authentication) {
         Student student = studentService.authenticateStudent(authentication);
         studentService.saveStudent(student.getId(), request);
         return "redirect:/student/view";
     }
-    @GetMapping("/view")
+    @GetMapping("/view") // view editable personal details
     public String view(Model model, Authentication authentication) {
-
         Student student = studentService.authenticateStudent(authentication);
         if (student == null) {
             return "redirect:/login"; // Kick them back to the login page.
         }
-
         StudentDTO dto = new StudentDTO(student);
-        // Fetch the student's full details using the ID from the session.
         model.addAttribute("student", dto); // Add the logged-in student's data to the model.
 
         return "student/view";
@@ -49,22 +45,17 @@ public class StudentController {
     @PostMapping("/register")
     public String saveNewStudent(
             @ModelAttribute StudentDTO student,
-            HttpServletResponse response,
-            RedirectAttributes redirectAttributes
+            HttpServletResponse response
     ){
+        // raw password needed
         LoginRequest request = new LoginRequest(-1, student.getPassword());
+        // get the student's id after saving to database
         Student newStudent = studentService.saveNewStudent(student);
         request.setId(newStudent.getId());
-        try {
-            authService.authenticateAndSetCookie(response, request);
-            // initialized student id and the raw password
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(
-                    "error",
-                    "Unable to automatically log in, please log in manually."
-            );
-            return "redirect:/login";
-        }
+
+        authService.authenticateAndSetCookie(response, request);
+        // initialized student id and the raw password
+
         return "redirect:/student/view";
     }
     @GetMapping("register")
