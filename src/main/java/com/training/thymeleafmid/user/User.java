@@ -5,6 +5,7 @@ import com.training.thymeleafmid.student.Student;
 import com.training.thymeleafmid.teacher.Teacher;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Data
 @Table(name = "users")
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"studentProfile", "teacherProfile"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +40,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-
 
     private Set<Role> roles = new HashSet<>();
 
