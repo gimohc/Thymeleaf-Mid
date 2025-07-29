@@ -40,8 +40,9 @@ public class StudentController {
             return "redirect:/login"; // Kick them back to the login page.
         }
 
+        StudentDTO dto = new StudentDTO(student);
         // Fetch the student's full details using the ID from the session.
-        model.addAttribute("student", student); // Add the logged-in student's data to the model.
+        model.addAttribute("student", dto); // Add the logged-in student's data to the model.
 
         return "student/view";
     }

@@ -28,8 +28,8 @@ public class TeacherController {
         if (teacher == null) {
             return "redirect:/login"; // Kick them back to the login page.
         }
-        // Fetch the student's full details using the ID from the session.
-        model.addAttribute("teacher", teacher); // Add the logged-in student's data to the model.
+        TeacherDTO dto = new TeacherDTO(teacher);
+        model.addAttribute("teacher", dto); // Add the logged-in student's data to the model.
 
         return "teacher/view";
     }
