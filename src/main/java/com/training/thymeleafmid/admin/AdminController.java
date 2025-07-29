@@ -20,8 +20,13 @@ public class AdminController {
     }
     @GetMapping("/index")
     public String index(Model model) {
+        // input field for the new role to be added
         model.addAttribute("role", new Role());
+
+        //current available roles
         model.addAttribute("roles", roleService.findAll());
+
+        // display all users to access their roles and manipulate them
         model.addAttribute("users", userRepository.findAll());
         return "admin/index";
     }
@@ -30,17 +35,17 @@ public class AdminController {
         roleService.addRole(role);
         return "redirect:/admin/index";
     }
-    @PostMapping("/deleteRole/{roleId}")
+    @PostMapping("/deleteRole/{roleId}") // completely removing a role
     public String deleteRole(@PathVariable long roleId) {
         roleService.removeRole(roleId);
         return "redirect:/admin/index";
     }
-    @PostMapping("/give")
+    @PostMapping("/give") // assign a role to a user
     public String give(@RequestParam("roleId") long roleId, @RequestParam("userId") long userId) {
         roleService.giveRole(roleId, userId);
         return "redirect:/admin/index";
     }
-    @PostMapping("removeRoles/{userId}")
+    @PostMapping("removeRoles/{userId}") // clear user roles
     public String remove(@PathVariable long userId) {
         roleService.removeRolesFromUser(userId);
         return "redirect:/admin/index";
