@@ -33,6 +33,7 @@ public class StudentService {
         Optional<Student> studentOpt = studentRepository.findById(id);
         return studentOpt.orElse(null);
     }
+    @Transactional
     public void saveStudent(long userId, StudentDTO request) {
         User userToUpdate = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
