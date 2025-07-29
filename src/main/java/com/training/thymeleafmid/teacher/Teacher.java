@@ -13,6 +13,7 @@ import java.util.Set;
 @Data
 @Table(name="teachers")
 @NoArgsConstructor
+@ToString(exclude = {"user", "students"})
 public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,7 @@ public class Teacher {
     //cascade means that if a teacher was deleted, then so will the students
     //orphanRemoval means that if a student was deleted, it will be removed from the teacher's set
     //lazy fetch means only retrieving the data when requested
-
-    @ToString.Exclude // Also exclude from toString
+    
     @EqualsAndHashCode.Exclude // Exclude this field from equals and hashCode
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = false, fetch = FetchType.LAZY)
     private Set<Student> students;

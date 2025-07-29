@@ -6,11 +6,13 @@ import com.training.thymeleafmid.teacher.Teacher;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @Table(name="students")
 @NoArgsConstructor
+@ToString(exclude = {"user", "teacher"})
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
