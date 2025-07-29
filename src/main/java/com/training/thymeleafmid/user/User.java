@@ -54,4 +54,23 @@ public class User {
     public void clearRoles() {
         this.roles.clear();
     }
+
+    public void setStudentProfile(Student studentProfile) {
+        if(this.studentProfile != null)
+           this.studentProfile.setUser(null);
+        if(studentProfile != null)
+            studentProfile.setUser(this);
+
+        this.studentProfile = studentProfile;
+
+    }
+    public void setTeacherProfile(Teacher teacherProfile) {
+        if(this.teacherProfile != null)
+            this.teacherProfile.setUser(null);
+        if(teacherProfile != null)
+            teacherProfile.setUser(this);
+
+        this.teacherProfile = teacherProfile;
+    }
+
 }
