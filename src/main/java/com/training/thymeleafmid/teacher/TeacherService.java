@@ -1,6 +1,7 @@
 package com.training.thymeleafmid.teacher;
 
 import com.training.thymeleafmid.Exceptions.RoleNotFoundException;
+import com.training.thymeleafmid.Exceptions.TeacherNotFoundException;
 import com.training.thymeleafmid.Exceptions.UserNotFoundException;
 import com.training.thymeleafmid.admin.Role;
 import com.training.thymeleafmid.admin.RoleRepository;
@@ -34,9 +35,11 @@ public class TeacherService {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
     }
-    public Teacher findById(long id){
+    public Teacher findById(long id) throws TeacherNotFoundException{
         Optional<Teacher> teacherOpt = teacherRepository.findById(id);
-        return teacherOpt.orElse(null);
+        return teacherOpt.orElseThrow(
+                () -> new TeacherNotFoundException("Teacher not found")
+        );
     }
     @Transactional
     public void addStudent(long studentId, long teacherId) {
@@ -62,7 +65,6 @@ public class TeacherService {
     @Transactional
     public Teacher saveNewTeacher(TeacherDTO request) {
         User user = new User();
-        Teacher teacher = new Teacher();
         Role role = roleRepository.findByName("ROLE_TEACHER")
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
@@ -70,12 +72,8 @@ public class TeacherService {
         user.setPassword(encoder.encode(request.getPassword()));
         user.setName(request.getName());
 
-
-        teacher.setPhoneNumber(request.getPhoneNumber());
-        teacher.setHourlyPay(request.getHourlyPay());
-        teacher.setWorkTime(request.getWorkTime());
+        Teacher teacher = new Teacher(request);
         teacher.setUser(user);
-        user.setTeacherProfile(teacher);
 
         return teacherRepository.save(teacher);
     }
@@ -95,8 +93,8 @@ public class TeacherService {
         profile.setWorkTime(request.getWorkTime());
 
     }
-    public Teacher authenticate(Authentication authentication) {
-        if(authentication == null) return null;
+    public Teacher authenticate(Authentication authentication) throws TeacherNotFoundException {
+        if(authentication == null) throw new TeacherNotFoundException("Teacher not found");
         UserDetails details = (UserDetails) authentication.getPrincipal();
         long teacherId = Long.parseLong(details.getUsername());
         return findById(teacherId);
