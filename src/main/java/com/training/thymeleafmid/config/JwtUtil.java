@@ -18,17 +18,19 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
+    // password exists in application.properties (.gitignored)
     @Value("${app.jwt.token}")
     private String password;
 
     private Key getSigningKey() {
+        // decode stored password from application.properties
         byte[] keyBytes = Decoders.BASE64.decode(this.password);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(keyBytes); // takes raw bytes and returns a cryptographic key
     }
 
     public String generateToken(UserDetails userDetails) {
         final int expirationMs = 86400000;
-
+        // set token information
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
