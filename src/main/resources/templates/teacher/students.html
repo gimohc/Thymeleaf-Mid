@@ -90,7 +90,7 @@
         <tbody>
         <tr th:each="student : ${students}" th:object="${student}">
             <td th:text="*{id}"></td>
-            <td th:text="*{name}"></td>
+            <td th:text="*{user.name}"></td>
             <td th:text="*{phoneNumber}"></td>
             <td>
                 <form th:action="@{/teacher/unassign/{studentId}(studentId=*{id})}" method="post">

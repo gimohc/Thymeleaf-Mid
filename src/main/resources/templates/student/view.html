@@ -115,7 +115,7 @@
         <label>Assigned Teacher:</label>
         <div th:if="${student.teacher != null}">
             <input type="hidden" th:field="*{teacher}" />
-            <span th:text="*{teacher.name}">Teacher Name</span>
+            <span th:text="*{teacher.user.name}">Teacher Name</span>
             <button type="submit" class="button-danger"
                     th:formaction="@{/student/unassign/{teacherId}(teacherId=${student.teacher.id})}"
                     th:formmethod="post">
