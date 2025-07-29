@@ -26,9 +26,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/**", "/*/register", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/teacher/**").hasAnyRole("TEACHER", "ADMIN")
-                        .requestMatchers("/student/**").hasRole("STUDENT")
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // authorization
+                        .requestMatchers("/teacher/**", "/student/**").authenticated() // authentication
                         .anyRequest().authenticated() // All other requests need authentication
                 )
                 // Tell Spring Security not to manage sessions, as we use JWTs
